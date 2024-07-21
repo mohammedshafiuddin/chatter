@@ -14,19 +14,23 @@ app.get('/', (req, res) => {
 
 app.get('/home-chats', async (req, res) => {
   const userId = req.query.userId;
-  
+  const userIdNum = Number(userId);
   const chatsQuery = 'select * from chat_message where sender_id = $1 or receiver_id = $1 order by created_at';
+  console.log({chatsQuery, userId})
+  
   const chats = await runSingleQuery(chatsQuery, [userId]);
   
-  const chatMap = new Map<number,string[]>();
+  const chatMap = new Map<number,any[]>();
   chats.forEach((chat:any)  => {
+    
     const chatId = chat.sender_id === userId ? chat.receiver_id : chat.sender_id;
     const fromMap = chatMap.get(chatId);
+    const msgType = chat.sender_id === userIdNum ? 'sent' : 'received';
     if(!fromMap) {
-      chatMap.set(chatId, [chat.message]);
+      chatMap.set(chatId, [{msg:chat.message, type:msgType}]);
     }
     else {
-      fromMap.push(chat.message);
+      fromMap.push({msg:chat.message, type:msgType});
     }
   })
   res.send(Object.fromEntries(chatMap));

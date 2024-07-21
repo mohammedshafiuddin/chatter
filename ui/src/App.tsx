@@ -1,13 +1,15 @@
-import './App.css'
-import ChatHome from './pages/chat'
+import "./App.css";
+import {WsProivder} from "./components/ws-provider";
+import ChatHome from "./pages/chat";
 
 function App() {
-
   return (
     <>
-      <ChatHome />
+      <WsProivder>
+        <ChatHome />
+      </WsProivder>
     </>
-  )
+  );
 }
 
-export default App
+export default App;

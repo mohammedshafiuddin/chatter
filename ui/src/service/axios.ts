@@ -2,7 +2,7 @@
 import axios from 'axios';
 import storageService from './StorageService';
 
-const baseURL = 'https://localhost:3000/';
+const baseURL = 'http://localhost:3000/';
 //  const baseURL = '/';
 
 const axiosInstance = axios.create({
@@ -18,7 +18,11 @@ axiosInstance.interceptors.request.use((config) => {
     if (token) config.headers.authorization = token;
 
     return config;
-  });
+  },);
+
+axiosInstance.interceptors.response.use(
+  (response) => response.data,
+);
 
 
 export default axiosInstance;
