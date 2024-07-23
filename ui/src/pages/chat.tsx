@@ -1,6 +1,5 @@
 import React from "react";
 import { useGetHomeChats } from "../query/home.query";
-import { useWebSocket } from "../components/ws-provider";
 import { wsContext } from "../contexts";
 
 interface Props {}
@@ -11,7 +10,19 @@ function ChatHome(props: Props) {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const wsData = React.useContext(wsContext);
   const socket = wsData!.socket;
-
+  const [wsMsgs,setWSMsgs] = React.useState<any[]>([])  
+  
+  React.useEffect(() => {
+    if(socket) {
+      socket.onmessage = (incomingData) => {
+        console.log({incomingData})
+        const parsedData = JSON.parse(incomingData.data)
+        if(parsedData.sender === activeUserId) {
+          setWSMsgs([...wsMsgs, {msg:parsedData.message, type:'received'}])
+        }
+      }
+    }
+  },[wsData])
   const {} = props;
   const activeChats =
     homeChats && activeUserId ? (homeChats as any)[activeUserId] : [];
@@ -20,14 +31,16 @@ function ChatHome(props: Props) {
     e.preventDefault();
     const text = inputRef.current?.value;
     if (text && socket) {
-      console.log('sending message')
+      setWSMsgs([...wsMsgs, {msg:text, type:'sent'}])
       socket.send(
-        JSON.stringify({ data: text, targetUserId: 3, type: "message" })
+        JSON.stringify({ data: text, targetUserId: activeUserId, type: "message" })
       );
     }
   };
+
+  const chatsToDisplay = [...activeChats, ...wsMsgs];
   return (
-    <div className="flex h-screen items-stretch">
+    <div className="flex h-screen items-stretch relative">
       <div className="w-64 bg-green-300">
         {Object.keys(homeChats ?? {}).map((userId) => {
           return (
@@ -41,8 +54,7 @@ function ChatHome(props: Props) {
         })}
       </div>
       <div className="grow bg-blue-300 flex flex-col">
-        {activeChats.map((chat: any) => {
-          console.log({ chat });
+        {chatsToDisplay.map((chat: any) => {
 
           if (chat.type == "received")
             return <div className="self-end">{chat.msg}</div>;

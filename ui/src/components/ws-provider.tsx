@@ -12,20 +12,15 @@ export function WsProivder(props: Props) {
   const socketRef = React.useRef<WebSocket | null>(null);
   React.useEffect(() => {
     // const wsUrl = window.location.origin.replace("http", "ws");
-    const wsUrl = "ws://localhost:3000/ws?userId=2";
+    const params = new URLSearchParams(window.location.search);
+    const userId = params.get("userId");
+    const wsUrl = "ws://localhost:3000/ws?userId=" + userId;
     const ws = new WebSocket(wsUrl);
     
     ws.onopen = (event) => {
-      console.log("connected", ws);
       socketRef.current = ws;
       setSocket(ws);
     };
-    ws.onmessage = (message) => {
-      console.log({ message });
-    };
-    // setInterval(() => {
-    //   console.log({socket, socketRef});
-    // }, 1000);
   }, []);
 
   return (

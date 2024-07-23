@@ -5,7 +5,9 @@ export const useGetHomeChats = () => {
     return useQuery({
         queryKey: ['get-home-chats'],
         queryFn: async () => {
-            const url = `/home-chats?userId=2`
+            const params = new URLSearchParams(window.location.search)
+            const userId = params.get('userId')
+            const url = `/home-chats?userId=${userId}`
             return await axiosInstance.get(url)
         }
     })

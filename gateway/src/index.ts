@@ -12,7 +12,8 @@ import axios from 'axios';
 import cors from 'cors';
 
 const app = express();
-app.use(cors())
+app.use(cors()) 
+
 const port = 3000;
 
 const httpServer = createServer(app);
@@ -23,10 +24,9 @@ const apiServerUrl = 'http://localhost:4000';
 app.get('/', (req, res) => {
   res.send('Hello, TypeScript with Express!');
 });
+console.log('apiServerUrl', apiServerUrl)
 
 app.get('/api/home-chats', async (req, res) =>{
-  console.log({userId: req.query.userId});
-  
   const resp = await axios.get(`${apiServerUrl}/home-chats?userId=${req.query.userId}`);
   
   res.send(resp.data);
